@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\OAuth2\Microsoft;
 
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
+use Microsoft\Graph\Graph;
+use Microsoft\Graph\Model;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -63,15 +65,24 @@ class AuthController extends AbstractController
         if (isset($authCode)) {
             // 初始化OAuth客户端
             $oauthClient = $microsoft->getProvider();
-      
+
             try {
-              // 创建令牌请求
-              $accessToken = $oauthClient->getAccessToken('authorization_code', [
-                'code' => $authCode
-              ]);
-      
-              // 临时测试！
-              return $this->redirectToHome('接收到访问令牌', $accessToken->getToken());
+                // 创建令牌请求
+                $accessToken = $oauthClient->getAccessToken('authorization_code', [
+                    'code' => $authCode
+                ]);
+
+                $graph = new Graph();
+                $graph->setAccessToken($accessToken->getToken());
+
+                // 获取用户信息
+                $user = $graph->createRequest('GET', '/me?$select=displayName,mail,mailboxSettings,userPrincipalName')
+                    ->setReturnType(Model\User::class)
+                    ->execute();
+
+                // 临时测试！
+                return $this->redirectToHome('接收到访问令牌',
+                '用户：' . $user->getDisplayName() . '；令牌：' . $accessToken->getToken());
             } catch (IdentityProviderException $e) {
                 return $this->redirectToHome('请求访问令牌时出错', json_encode($e->getResponseBody()));
             }
