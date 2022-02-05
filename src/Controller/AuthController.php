@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\OAuth2\Microsoft;
+use App\TokenStore\TokenCache;
 
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Microsoft\Graph\Graph;
@@ -43,7 +44,7 @@ class AuthController extends AbstractController
      *
      * @Route("/callback", name="callback")
      */
-    public function callback(Request $request, Microsoft $microsoft)
+    public function callback(Request $request, Microsoft $microsoft, TokenCache $cache)
     {
         $session = $this->getSession();
 
@@ -54,14 +55,12 @@ class AuthController extends AbstractController
         $session->remove($this->stateName);
 
         $providedState = $request->query->get('state');
-        dump($expectedState, $providedState);
 
         if (!$providedState || $expectedState != $providedState) {
             return $this->redirectToHome('无效的认证状态', '提供的认证状态与预期值不匹配');
         }
 
         $authCode = $request->query->get('code');
-        dump($authCode);
         if (isset($authCode)) {
             // 初始化OAuth客户端
             $oauthClient = $microsoft->getProvider();
@@ -80,9 +79,10 @@ class AuthController extends AbstractController
                     ->setReturnType(Model\User::class)
                     ->execute();
 
-                // 临时测试！
-                return $this->redirectToHome('接收到访问令牌',
-                '用户：' . $user->getDisplayName() . '；令牌：' . $accessToken->getToken());
+                // 储存令牌
+                $cache->storeTokens($accessToken, $user);
+
+                return $this->redirectToRoute('home');
             } catch (IdentityProviderException $e) {
                 return $this->redirectToHome('请求访问令牌时出错', json_encode($e->getResponseBody()));
             }
@@ -96,9 +96,11 @@ class AuthController extends AbstractController
      *
      * @Route("/signout", name="signout")
      */
-    public function signout()
+    public function signout(TokenCache $cache)
     {
-        // TODO
+        $cache->clearTokens();
+
+        return $this->redirectToRoute('home');
     }
 
     public function redirectToHome(string $info, string $detail)
