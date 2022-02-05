@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="jumbotron">
+  <h1>MicroSoft Graph 教程</h1>
+  <p class="lead">这个示例应用展示了如何在PHP中使用Microsoft Graph API访问用户数据</p>
+  {% if data.name is defined %}
+    <h4>欢迎，{{ data.name }}</h4>
+    <p>请使用顶部的导航栏开始本教程。</p>
+  {% else %}
+    <a href="{{ path('signin') }}" class="btn btn-primary btn-large">点击登录</a>
+  {% endif %}
+</div>
+{% endblock %}
