@@ -4,6 +4,16 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    client_id: '%env(resolve:MICROSOFT_CLIENT_ID)%'
+    client_secret: '%env(resolve:MICROSOFT_CLIENT_SECRET)%'
+    callback_route: callback
+    graph_scopes:
+        - openid
+        - profile
+        - offline_access
+        - user.read
+        - mailboxsettings.read
+        - calendars.readwrite
 
 services:
     # default configuration for services in *this* file
