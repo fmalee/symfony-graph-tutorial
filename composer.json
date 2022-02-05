@@ -9,6 +9,7 @@
         "ext-iconv": "*",
         "league/oauth2-client": "^2.6",
         "microsoft/microsoft-graph": "^1.52",
+        "sensio/framework-extra-bundle": "^6.2",
         "symfony/console": "6.0.*",
         "symfony/dotenv": "6.0.*",
         "symfony/flex": "^2",
