@@ -68,7 +68,11 @@ class CalendarController extends AbstractController
             ->setReturnType(Model\Event::class)
             ->execute();
 
-        return $this->json($events);
+        $viewData['events'] = $events;
+
+        return $this->render('calendar.html.twig', [
+            'data' => $viewData,
+        ]);
     }
 
     /**

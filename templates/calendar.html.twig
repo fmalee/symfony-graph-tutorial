@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>日历</h1>
+<h2>{{ data.date_range }}</h2>
+{# <a class="btn btn-light btn-sm mb-3" href="{{ path('new_event') }}">新建事件</a> #}
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">组织者</th>
+      <th scope="col">主题</th>
+      <th scope="col">开始</th>
+      <th scope="col">结束</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for event in data.events %}
+      <tr>
+        <td>{{ event.getOrganizer.getEmailAddress.getName }}</td>
+        <td>{{ event.getSubject }}</td>
+        <td>{{ event.getStart.getDateTime|date('n/j/y g:i A') }}</td>
+        <td>{{ event.getEnd.getDateTime|date('n/j/y g:i A') }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
